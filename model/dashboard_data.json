@@ -1,0 +1,26 @@
+{
+  "total_samples": 162718,
+  "risk_distribution": {
+    "High": 0.3399992625278088,
+    "Low": 0.33000036873609556,
+    "Moderate": 0.33000036873609556
+  },
+  "aqi_distribution": {
+    "Good": 0.49517570274954215,
+    "Moderate": 0.4883417937781929,
+    "Unhealthy for Sensitive Groups": 0.015253383153676914,
+    "Unhealthy": 0.0012291203185879865
+  },
+  "model_accuracy": 0.893743854473943,
+  "model_f1_macro": 0.8924939049140002,
+  "features": [
+    "pm25",
+    "pm10",
+    "no2",
+    "so2",
+    "co",
+    "o3",
+    "temperature",
+    "humidity"
+  ]
+}
