@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Metro Manila Air Pollution Risk Assessment</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo-section">
+        <div class="logo"><i class="fas fa-wind"></i></div>
+        <div class="header-text">
+          <h1>Metro Manila Air Pollution Risk Assessment</h1>
+          <p>Real-time air quality monitoring and health risk prediction</p>
+        </div>
+      </div>
+
+      <div class="model-info">
+        <div class="accuracy" id="modelAccuracy">--</div>
+        <div class="label">Model Accuracy</div>
+      </div>
+    </header>
+
+    <div class="alert" id="apiAlert" style="display:none;"></div>
+
+    <div class="main-content">
+      <!-- LEFT COLUMN -->
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-map-marker-alt"></i> Select Location & View Data</h2>
+
+        <div class="location-selector">
+          <label for="location">Select Metro Manila City:</label>
+          <select id="location">
+            <option value="">-- Choose a location --</option>
+          </select>
+        </div>
+
+        <div class="buttons" id="buttonRow">
+          <button class="btn btn-primary" id="predictBtn">
+            <i class="fas fa-bolt"></i> Generate Prediction
+          </button>
+
+          <button class="btn btn-secondary" id="refreshBtn">
+            <i class="fas fa-sync-alt"></i> Refresh Cities
+          </button>
+        </div>
+
+        <div id="dataLoading" class="spinner" style="display:none;">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Loading...</p>
+        </div>
+
+        <div id="airQualityData" style="display:none;">
+          <h3 style="margin-top:15px;margin-bottom:15px;">
+            <i class="fas fa-database"></i> Air Quality Data Used for Prediction
+          </h3>
+
+          <div class="data-grid">
+            <div class="data-item">
+              <div class="data-label">PM2.5 (μg/m³)</div>
+              <div class="data-value" id="actualPm25">--</div>
+              <div class="data-status" id="pm25Status"></div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">PM10 (μg/m³)</div>
+              <div class="data-value" id="actualPm10">--</div>
+              <div class="data-status" id="pm10Status"></div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">NO₂ (ppb)</div>
+              <div class="data-value" id="actualNo2">--</div>
+              <div class="data-status" id="no2Status"></div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">SO₂ (ppb)</div>
+              <div class="data-value" id="actualSo2">--</div>
+              <div class="data-status" id="so2Status"></div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">CO (ppm)</div>
+              <div class="data-value" id="actualCo">--</div>
+              <div class="data-status" id="coStatus"></div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">O₃ (ppb)</div>
+              <div class="data-value" id="actualO3">--</div>
+              <div class="data-status" id="o3Status"></div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">Temperature (°C)</div>
+              <div class="data-value" id="actualTemp">--</div>
+              <div class="data-status" id="tempStatus"></div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">Humidity (%)</div>
+              <div class="data-value" id="actualHumidity">--</div>
+              <div class="data-status" id="humidityStatus"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="noDataMessage" class="no-message">
+          <i class="fas fa-map-marker-alt"></i>
+          <h3>Select a Location</h3>
+          <p>Select a Metro Manila city, then click <b>Generate Prediction</b> to view pollutant data.</p>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-chart-line"></i> Risk Assessment Results</h2>
+
+        <div id="resultsContainer" style="display:none;">
+          <div class="prediction-header">
+            <h3><i class="fas fa-city"></i> <span id="predictionLocation">--</span></h3>
+            <p class="timestamp">Generated: <span id="predictionTime">--</span></p>
+          </div>
+
+          <div class="risk-level-display" id="riskDisplay">
+            <h3 class="risk-title" id="riskTitle">
+              <i class="fas fa-exclamation-triangle"></i> <span id="riskLevelText">Predicted Risk Level</span>
+            </h3>
+            <p class="risk-confidence">Confidence: <span id="confidenceValue">--</span></p>
+            <div class="aqi-display">
+              AQI: <span id="aqiValue">--</span> | <span id="aqiCategory">--</span>
+            </div>
+            <div style="margin-top:8px; font-size:0.9rem; color:#fff; opacity:0.95;">
+              Main pollutant: <strong id="mainPollutant">--</strong>
+            </div>
+          </div>
+
+          <h4><i class="fas fa-chart-pie"></i> Prediction Probabilities</h4>
+          <div class="probabilities">
+            <div class="probability-item prob-low">
+              <div class="prob-label">Low</div>
+              <div class="prob-value" id="probLow">--</div>
+            </div>
+            <div class="probability-item prob-moderate">
+              <div class="prob-label">Moderate</div>
+              <div class="prob-value" id="probModerate">--</div>
+            </div>
+            <div class="probability-item prob-high">
+              <div class="prob-label">High</div>
+              <div class="prob-value" id="probHigh">--</div>
+            </div>
+          </div>
+
+          <!-- Recommendations Section -->
+          <div class="recommendations">
+            <h4><i class="fas fa-clipboard-list"></i> Health Recommendations</h4>
+
+            <div class="recommendation-category">
+              <h4><i class="fas fa-users"></i> General Population</h4>
+              <ul id="generalRecs"></ul>
+            </div>
+
+            <div class="recommendation-category">
+              <h4><i class="fas fa-heartbeat"></i> Sensitive Groups</h4>
+              <ul id="sensitiveRecs"></ul>
+            </div>
+
+            <div class="recommendation-category">
+              <h4><i class="fas fa-tasks"></i> Preventive Actions</h4>
+              <ul id="actionRecs"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div id="noResultsMessage" class="no-message">
+          <i class="fas fa-chart-bar"></i>
+          <h3>No Prediction Available</h3>
+          <p>Select a location and click "Generate Prediction"</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW DATA USED BOX -->
+    <div class="charts-section">
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-chart-bar"></i> View Data Used for Prediction</h2>
+
+        <div class="chart-container">
+          <canvas id="inputsBarChart"></canvas>
+        </div>
+
+        <div class="chart-note" id="chartNote">
+          <i class="fas fa-info-circle"></i> This chart shows pollutant & environment values used for prediction.
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>Metro Manila Air Pollution Risk Assessment System</p>
+      <p>Powered by Machine Learning</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
