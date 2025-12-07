@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+numpy
+pandas
+scikit-learn
+joblib
+imbalanced-learn     # only if your saved pipeline used imblearn
