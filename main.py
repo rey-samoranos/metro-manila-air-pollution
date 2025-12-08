@@ -290,4 +290,9 @@ bundle_path = os.environ.get(
     os.path.join(MODEL_DIR, "air_pollution_model_bundle.pkl")
 )
 
+from fastapi.staticfiles import StaticFiles
+app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
+
+
+
 
