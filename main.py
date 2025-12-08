@@ -269,16 +269,6 @@ def predict(req: PredictRequest):
 
     return response
 
-# optional: load .env in non-production environments and prefer env vars if present
-from dotenv import load_dotenv
-
-# If ENV != "production", try to load a local .env file (dev only)
-if os.environ.get("ENV", "production") != "production":
-    # safe: will do nothing if python-dotenv isn't installed or .env missing
-    try:
-        load_dotenv()
-    except Exception:
-        pass
 
 # NOTE: below we still compute BASE_DIR as before, but allow overrides via env vars.
 BASE_DIR = os.path.dirname(__file__)
@@ -292,6 +282,7 @@ bundle_path = os.environ.get(
 
 from fastapi.staticfiles import StaticFiles
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
+
 
 
 
