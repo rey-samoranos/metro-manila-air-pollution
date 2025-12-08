@@ -268,3 +268,26 @@ def predict(req: PredictRequest):
     }
 
     return response
+
+# optional: load .env in non-production environments and prefer env vars if present
+from dotenv import load_dotenv
+
+# If ENV != "production", try to load a local .env file (dev only)
+if os.environ.get("ENV", "production") != "production":
+    # safe: will do nothing if python-dotenv isn't installed or .env missing
+    try:
+        load_dotenv()
+    except Exception:
+        pass
+
+# NOTE: below we still compute BASE_DIR as before, but allow overrides via env vars.
+BASE_DIR = os.path.dirname(__file__)
+# If you set DATA_DIR in Render, it will be used; otherwise fallback to BASE_DIR/model
+MODEL_DIR = os.environ.get("DATA_DIR", os.path.join(BASE_DIR, "model"))
+# If you set MODEL_PATH in Render, it will be used; otherwise fallback to MODEL_DIR/air_pollution_model_bundle.pkl
+bundle_path = os.environ.get(
+    "MODEL_PATH",
+    os.path.join(MODEL_DIR, "air_pollution_model_bundle.pkl")
+)
+
+
